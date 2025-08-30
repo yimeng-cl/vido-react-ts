@@ -190,9 +190,27 @@ export const getPlaybackRateOptions = (): { value: number; label: string }[] => 
     { value: 1.25, label: '1.25x' },
     { value: 1.5, label: '1.5x' },
     { value: 1.75, label: '1.75x' },
-    { value: 2, label: '2x' }
+    { value: 2, label: '2x' },
+    { value: 2.5, label: '2.5x' },
+    { value: 3, label: '3x' },
+    { value: 3.5, label: '3.5x' },
+    { value: 4, label: '4x' },
+    { value: 4.5, label: '4.5x' },
+    { value: 5, label: '5x' },
+    { value: 5.5, label: '5.5x' },
+    { value: 6, label: '6x' },
+    { value: 6.5, label: '6.5x' },
+    { value: 7, label: '7x' },
+    { value: 7.5, label: '7.5x' },
+    { value: 8, label: '8x' },
+    { value: 8.5, label: '8.5x' },
+    { value: 9, label: '9x' },
+    { value: 9.5, label: '9.5x' },
+    { value: 10, label: '10x' },
   ];
 };
+
+
 
 /**
  * 检查是否支持画中画模式
