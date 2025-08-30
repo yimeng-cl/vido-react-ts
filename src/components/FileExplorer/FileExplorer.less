@@ -1,0 +1,155 @@
+// 文件浏览器样式 - 简化版本配合Antd
+@import "../../styles/variables.less";
+
+.file-explorer-card {
+  height: 100%;
+
+  .ant-card-body {
+    padding: 16px;
+    height: calc(100% - 57px);
+    overflow: hidden;
+  }
+
+  .explorer-content {
+    height: calc(100% - 40px);
+    overflow: hidden;
+
+    // 自定义滚动条
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+  }
+
+  .search-results {
+    .ant-card {
+      margin-bottom: 8px;
+
+      &:hover {
+        border-color: @primary-color;
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+      }
+    }
+
+    .video-info-container {
+      flex: 1;
+    }
+
+    .search-card {
+      cursor: pointer;
+    }
+
+    .search-title {
+      margin: 16px 0;
+    }
+
+    .search-space {
+      width: 100%;
+    }
+  }
+
+  .hidden-input {
+    display: none;
+  }
+
+  .last-folder-info {
+    margin-bottom: 12px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .cache-restore-info {
+    margin-bottom: 12px;
+    padding: 6px 8px;
+    background: rgba(24, 144, 255, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(24, 144, 255, 0.2);
+  }
+
+  .loading-container {
+    text-align: center;
+    padding: 40px 0;
+
+    .loading-text {
+      margin-top: 16px;
+    }
+  }
+
+  // Tree组件样式优化
+  .file-tree {
+    height: 100%;
+    overflow-y: auto;
+    font-size: 14px;
+
+    .ant-tree-node-content-wrapper {
+      &:hover {
+        background-color: rgba(24, 144, 255, 0.1);
+      }
+
+      &.ant-tree-node-selected {
+        background-color: rgba(24, 144, 255, 0.2);
+      }
+    }
+
+    .ant-tree-title {
+      .ant-typography {
+        margin-bottom: 0;
+      }
+    }
+
+    // 自定义滚动条
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .file-explorer-card {
+    .ant-card-head {
+      padding: 0 12px;
+
+      .ant-card-head-title {
+        font-size: 14px;
+      }
+    }
+
+    .ant-card-body {
+      padding: 12px;
+    }
+
+    .ant-tree {
+      font-size: 13px;
+    }
+  }
+}

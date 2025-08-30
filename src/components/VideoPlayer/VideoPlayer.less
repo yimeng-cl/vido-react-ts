@@ -1,0 +1,356 @@
+// 视频播放器样式
+@import "../../styles/variables.less";
+
+.video-player {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  border-radius: @border-radius;
+  overflow: hidden;
+  outline: none;
+
+  &.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    border-radius: 0;
+  }
+
+  .video-element {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    cursor: pointer;
+  }
+
+  .video-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    padding: @spacing-lg @spacing-md @spacing-md;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+
+    &.visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .progress-container {
+      margin-bottom: @spacing-md;
+      cursor: pointer;
+
+      .progress-bar {
+        position: relative;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+        overflow: hidden;
+
+        &:hover {
+          height: 6px;
+
+          .progress-thumb {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+          }
+        }
+
+        .progress-filled {
+          height: 100%;
+          background: @primary-color;
+          border-radius: 2px;
+          transition: width 0.1s ease;
+        }
+
+        .progress-thumb {
+          position: absolute;
+          top: 50%;
+          width: 12px;
+          height: 12px;
+          background: @primary-color;
+          border-radius: 50%;
+          transform: translateX(-50%) translateY(-50%) scale(0);
+          opacity: 0;
+          transition: all 0.2s ease;
+          pointer-events: none;
+        }
+      }
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+
+      .controls-left,
+      .controls-right {
+        display: flex;
+        align-items: center;
+        gap: @spacing-md;
+      }
+
+      .control-btn {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: @spacing-xs;
+        border-radius: @border-radius;
+        font-size: 18px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: scale(1.1);
+        }
+
+        &.play-pause {
+          font-size: 20px;
+        }
+      }
+
+      .volume-control {
+        display: flex;
+        align-items: center;
+        gap: @spacing-sm;
+
+        .volume-slider {
+          width: 80px;
+          height: 4px;
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 2px;
+          outline: none;
+          cursor: pointer;
+          -webkit-appearance: none;
+
+          &::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: @primary-color;
+            border-radius: 50%;
+            cursor: pointer;
+          }
+
+          &::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: @primary-color;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+          }
+        }
+      }
+
+      .time-display {
+        font-size: @font-size-sm;
+        font-family: "Courier New", monospace;
+        color: rgba(255, 255, 255, 0.9);
+        white-space: nowrap;
+      }
+
+      .playback-rate-select {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: @border-radius;
+        padding: @spacing-xs @spacing-sm;
+        font-size: @font-size-sm;
+        cursor: pointer;
+        outline: none;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        option {
+          background: #333;
+          color: white;
+        }
+      }
+    }
+  }
+
+  .no-video {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    padding: @spacing-xl;
+
+    .no-video-icon {
+      font-size: 64px;
+      margin-bottom: @spacing-lg;
+      opacity: 0.6;
+    }
+
+    .no-video-text {
+      font-size: @font-size-lg;
+      margin-bottom: @spacing-sm;
+      font-weight: 500;
+    }
+
+    .no-video-hint {
+      font-size: @font-size-sm;
+      opacity: 0.7;
+      line-height: 1.6;
+    }
+  }
+
+  // 鼠标悬停时显示控制栏
+  &:hover .video-controls {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
+// 加载状态
+.video-player .video-element:not([src]) {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: loading-pattern 2s linear infinite;
+}
+
+@keyframes loading-pattern {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .video-player {
+    .video-controls {
+      padding: @spacing-md @spacing-sm @spacing-sm;
+
+      .controls-row {
+        flex-direction: column;
+        gap: @spacing-sm;
+        align-items: stretch;
+
+        .controls-left,
+        .controls-right {
+          justify-content: center;
+          gap: @spacing-sm;
+        }
+
+        .volume-control {
+          .volume-slider {
+            width: 60px;
+          }
+        }
+
+        .time-display {
+          font-size: 12px;
+        }
+
+        .control-btn {
+          font-size: 16px;
+          min-width: 28px;
+          height: 28px;
+        }
+      }
+
+      .progress-container {
+        .progress-bar {
+          height: 6px;
+
+          .progress-thumb {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-50%) scale(1);
+          }
+        }
+      }
+    }
+
+    .no-video {
+      padding: @spacing-md;
+
+      .no-video-icon {
+        font-size: 48px;
+      }
+
+      .no-video-text {
+        font-size: @font-size-base;
+      }
+
+      .no-video-hint {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+// 全屏模式下的特殊样式
+.video-player.fullscreen {
+  .video-controls {
+    .controls-row {
+      .time-display {
+        font-size: @font-size-base;
+      }
+
+      .control-btn {
+        font-size: 24px;
+        min-width: 40px;
+        height: 40px;
+      }
+    }
+
+    .progress-container {
+      .progress-bar {
+        height: 6px;
+      }
+    }
+  }
+}
+
+// 画中画模式指示器
+.video-player video:picture-in-picture {
+  box-shadow: 0 0 0 2px @primary-color;
+}
+
+// 键盘焦点样式
+.video-player:focus {
+  outline: 2px solid @primary-color;
+  outline-offset: 2px;
+}
+
+// 控制栏动画
+.video-controls.visible {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
