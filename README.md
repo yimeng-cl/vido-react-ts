@@ -1,5 +1,7 @@
 # React + TypeScript + Vite
 
+可以播放本地视频的一个小项目，不想运行，可以直接打开 dist/index.html ，也可以
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
