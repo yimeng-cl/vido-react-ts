@@ -55,6 +55,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentVideo, onVideoEnd, onT
         duration: 0,
         isPlaying: false,
       }));
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.playbackRate = playerState.playbackRate;
+        }
+      }, 20);
     }
 
     return () => {
@@ -128,7 +133,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentVideo, onVideoEnd, onT
       setPlayerState(prev => ({ ...prev, playbackRate: rate }));
     }
   };
-
   // 进度条拖拽
   const handleProgressMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -266,6 +270,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentVideo, onVideoEnd, onT
           <video
             ref={videoRef}
             src={objectURL || ""}
+            autoPlay
             onLoadedMetadata={handleLoadedMetadata}
             onTimeUpdate={handleTimeUpdate}
             onPlay={handlePlay}

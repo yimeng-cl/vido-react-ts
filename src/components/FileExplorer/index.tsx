@@ -1,6 +1,6 @@
 // 文件浏览器组件
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { Button, Input, Tree, Empty, Spin, Card, Typography, Space } from "antd";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import type { FileExplorerProps, FolderNode, VideoFile } from "../../types/video";
@@ -17,126 +17,13 @@ import "./FileExplorer.less";
 const { Search } = Input;
 const { Title, Text } = Typography;
 
-// 缓存键名
-const FOLDER_CACHE_KEY = "video-player-last-folder";
-const FOLDER_CONTENT_CACHE_KEY = "video-player-folder-content";
-
 const FileExplorer: React.FC<FileExplorerProps> = ({ onVideoSelect, onFolderLoad }) => {
   const [folders, setFolders] = useState<FolderNode[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<VideoFile[]>([]);
   const [treeData, setTreeData] = useState<any[]>([]);
-  const [lastFolderPath, setLastFolderPath] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // 保存文件夹路径到缓存
-  const saveFolderToCache = (files: FileList, folderTree: FolderNode[]) => {
-    if (files.length > 0) {
-      const firstFile = files[0];
-      const folderPath = firstFile.webkitRelativePath ? firstFile.webkitRelativePath.split("/")[0] : "未知文件夹";
-
-      // 保存基本信息
-      localStorage.setItem(
-        FOLDER_CACHE_KEY,
-        JSON.stringify({
-          folderName: folderPath,
-          timestamp: Date.now(),
-          fileCount: files.length,
-        })
-      );
-
-      // 保存文件夹结构（简化版，不包含File对象）
-      const simplifiedTree = simplifyFolderTree(folderTree);
-      localStorage.setItem(
-        FOLDER_CONTENT_CACHE_KEY,
-        JSON.stringify({
-          folderTree: simplifiedTree,
-          timestamp: Date.now(),
-        })
-      );
-
-      setLastFolderPath(folderPath);
-    }
-  };
-
-  // 简化文件夹树结构，移除File对象以便序列化
-  const simplifyFolderTree = (folders: FolderNode[]): any[] => {
-    return folders.map(folder => ({
-      name: folder.name,
-      path: folder.path,
-      children: simplifyFolderTree(folder.children),
-      videos: folder.videos.map(video => ({
-        name: video.name,
-        path: video.path,
-        size: video.size,
-      })),
-      allFiles:
-        folder.allFiles?.map(file => ({
-          name: file.name,
-          path: file.path,
-          size: file.size,
-          isVideo: file.isVideo,
-        })) || [],
-      isExpanded: folder.isExpanded,
-    }));
-  };
-
-  // 从缓存加载文件夹信息
-  const loadFolderFromCache = () => {
-    try {
-      const cached = localStorage.getItem(FOLDER_CACHE_KEY);
-      const contentCached = localStorage.getItem(FOLDER_CONTENT_CACHE_KEY);
-
-      if (cached) {
-        const { folderName, timestamp, fileCount } = JSON.parse(cached);
-        setLastFolderPath(folderName);
-
-        // 如果有内容缓存，尝试加载
-        if (contentCached) {
-          const { folderTree, timestamp: contentTimestamp } = JSON.parse(contentCached);
-
-          // 检查缓存是否过期（7天）
-          const isExpired = Date.now() - contentTimestamp > 7 * 24 * 60 * 60 * 1000;
-
-          if (!isExpired && folderTree) {
-            // 恢复文件夹结构（但没有File对象，所以无法播放）
-            const restoredFolders = restoreFolderTree(folderTree);
-            setFolders(restoredFolders);
-            setTreeData(convertToTreeData(restoredFolders));
-            onFolderLoad(restoredFolders);
-
-            console.log(`从缓存恢复文件夹结构：${folderName}（${fileCount}个文件）`);
-            console.log("注意：需要重新选择文件夹才能播放视频");
-
-            return { folderName, timestamp, fileCount, restored: true };
-          }
-        }
-
-        return { folderName, timestamp, fileCount, restored: false };
-      }
-    } catch (error) {
-      console.warn("加载缓存失败:", error);
-    }
-    return null;
-  };
-
-  // 恢复文件夹树结构
-  const restoreFolderTree = (simplifiedTree: any[]): FolderNode[] => {
-    return simplifiedTree.map(folder => ({
-      name: folder.name,
-      path: folder.path,
-      children: restoreFolderTree(folder.children || []),
-      videos: folder.videos || [],
-      allFiles: folder.allFiles || [],
-      isExpanded: folder.isExpanded || false,
-    }));
-  };
-
-  // 组件初始化时加载缓存
-  useEffect(() => {
-    loadFolderFromCache();
-  }, []);
 
   // 将文件夹结构转换为Antd Tree组件需要的数据格式
   const convertToTreeData = (folders: FolderNode[]): any[] => {
@@ -206,9 +93,6 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onVideoSelect, onFolderLoad
       // 构建完整文件夹树（包含所有文件）
       const folderTree = buildCompleteFolderTree(files);
 
-      // 保存文件夹到缓存（包含文件夹结构）
-      saveFolderToCache(files, folderTree);
-
       setFolders(folderTree);
       setTreeData(convertToTreeData(folderTree));
       onFolderLoad(folderTree);
@@ -254,7 +138,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onVideoSelect, onFolderLoad
 
         // 检查是否有实际的File对象（从缓存恢复的没有File对象）
         if (!fileData.file) {
-          alert(`这是从缓存恢复的文件列表。\n\n要播放视频，请重新选择文件夹。`);
+          alert(`请重新选择文件夹。`);
           return;
         }
 
@@ -332,24 +216,6 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onVideoSelect, onFolderLoad
         onChange={handleFolderSelect}
         aria-label='选择文件夹'
       />
-
-      {/* 上次选择的文件夹信息 */}
-      {lastFolderPath && folders.length === 0 && (
-        <div className='last-folder-info'>
-          <Text type='secondary' style={{ fontSize: "12px" }}>
-            💾 上次选择：{lastFolderPath}
-          </Text>
-        </div>
-      )}
-
-      {/* 缓存恢复提示 */}
-      {folders.length > 0 && lastFolderPath && (
-        <div className='cache-restore-info'>
-          <Text type='secondary' style={{ fontSize: "11px" }}>
-            📂 已从缓存恢复：{lastFolderPath} | 💡 要播放视频请重新选择文件夹
-          </Text>
-        </div>
-      )}
 
       {/* 搜索框 */}
       {folders.length > 0 && (
