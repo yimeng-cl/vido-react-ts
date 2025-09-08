@@ -33,7 +33,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentVideo, onVideoEnd, onT
 
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
+  const isDragging = useRef(false);
   const controlsTimeoutRef = useRef<number>(null);
 
   // 更新当前视频
@@ -82,7 +82,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentVideo, onVideoEnd, onT
 
   // 时间更新
   const handleTimeUpdate = () => {
-    if (videoRef.current && !isDragging) {
+    if (videoRef.current && !isDragging.current) {
       const currentTime = videoRef.current.currentTime;
       setPlayerState(prev => ({
         ...prev,
@@ -135,17 +135,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentVideo, onVideoEnd, onT
   };
   // 进度条拖拽
   const handleProgressMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
+    isDragging.current = true;
     handleProgressClick(e);
   };
 
   const handleProgressClick = (e: React.MouseEvent) => {
+    isDragging.current = false;
     if (progressBarRef.current && videoRef.current) {
       const rect = progressBarRef.current.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       const progress = (clickX / rect.width) * 100;
       const newTime = calculateTimeFromProgress(progress, playerState.duration);
-
       videoRef.current.currentTime = newTime;
       setPlayerState(prev => ({ ...prev, currentTime: newTime }));
     }
@@ -260,7 +260,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ currentVideo, onVideoEnd, onT
     };
   }, [playerState.isPlaying]);
 
-  const progress = calculateProgress(playerState.currentTime, playerState.duration);
+  const progress = calculateProgress(playerState.currentTime, playerState.duration || 0);
   const playbackRateOptions = getPlaybackRateOptions();
 
   return (

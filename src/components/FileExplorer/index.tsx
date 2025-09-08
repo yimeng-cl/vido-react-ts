@@ -1,12 +1,12 @@
 // 文件浏览器组件
 
-import React, { useState, useRef } from "react";
-import { Button, Input, Tree, Empty, Spin, Card, Typography, Space } from "antd";
 import { FolderOpenOutlined } from "@ant-design/icons";
+import { Button, Card, Empty, Input, Space, Spin, Tree, Typography } from "antd";
+import React, { useRef, useState } from "react";
 import type { FileExplorerProps, FolderNode, VideoFile } from "../../types/video";
 import {
-  convertFilesToVideoFiles,
   buildCompleteFolderTree,
+  convertFilesToVideoFiles,
   formatFileSize,
   getAllVideosFromFolder,
   searchVideos,
@@ -17,7 +17,7 @@ import "./FileExplorer.less";
 const { Search } = Input;
 const { Title, Text } = Typography;
 
-const FileExplorer: React.FC<FileExplorerProps> = ({ onVideoSelect, onFolderLoad }) => {
+const FileExplorer: React.FC<FileExplorerProps> = ({ onVideoSelect, setPlaylist }) => {
   const [folders, setFolders] = useState<FolderNode[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -94,8 +94,10 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onVideoSelect, onFolderLoad
       const folderTree = buildCompleteFolderTree(files);
 
       setFolders(folderTree);
-      setTreeData(convertToTreeData(folderTree));
-      onFolderLoad(folderTree);
+      const newTreeData = convertToTreeData(folderTree);
+      const videoPaths = getVideoPath(newTreeData);
+      setPlaylist(videoPaths);
+      setTreeData(newTreeData);
 
       // 清空搜索
       setSearchTerm("");
@@ -157,6 +159,16 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onVideoSelect, onFolderLoad
         }
       }
     }
+  };
+
+  /** 获取所有视频路径 */
+  const getVideoPath = (treeData: any[]): any[] => {
+    return treeData.reduce((acc, item) => {
+      if (item.children) {
+        return [...acc, ...getVideoPath(item.children)];
+      }
+      return [...acc, item.fileData];
+    }, []);
   };
 
   // 渲染搜索结果

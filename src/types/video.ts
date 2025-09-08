@@ -37,13 +37,13 @@ export interface PlayerState {
 }
 
 export interface FileExplorerProps {
+  currentVideo: VideoFile | null; // 当前视频
   onVideoSelect: (video: VideoFile) => void; // 选择视频回调
-  onFolderLoad: (folders: FolderNode[]) => void; // 加载文件夹回调
+  setPlaylist: (playlist: VideoFile[]) => void; // 设置播放列表回调
 }
 
 export interface VideoPlayerProps {
   currentVideo: VideoFile | null; // 当前视频
-  playlist: PlaylistItem[]; // 播放列表
   onVideoEnd: () => void; // 视频播放结束回调
   onTimeUpdate: (currentTime: number) => void; // 时间更新回调
 }
